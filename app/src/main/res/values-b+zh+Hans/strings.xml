@@ -1442,4 +1442,20 @@
   <string name="chat_queue_remove">移除排队消息</string>
   <string name="chat_queue_images_only">[%1$d 张图片]</string>
   <string name="chat_queue_files_only">[%1$d 个文件]</string>
+  <string name="mcp_select_all">全选工具</string>
+  <string name="mcp_deselect_all">取消全选</string>
+  <string name="mcp_selection_count">已选择 %1$d / %2$d 个工具</string>
+  <string name="mcp_select_all_confirm">启用全部工具？</string>
+  <string name="mcp_select_all_summary">%1$s 中部分工具可能修改数据或访问外部服务，是否一次性启用全部工具？</string>
+  <string name="mcp_bulk_failed">工具选择保存失败</string>
+  <string name="mcp_edit_server">编辑服务器</string>
+  <string name="mcp_edit_server_summary">修改服务器名称、地址、认证方式或协议模式。</string>
+  <string name="mcp_authentication">认证方式</string>
+  <string name="mcp_protocol_auto">自动协商</string>
+  <string name="mcp_edit_token_hint">输入新的 Bearer Token；留空则保留现有 Token。</string>
+  <string name="mcp_token_required">使用 Bearer Token 认证时必须填写 Token。</string>
+  <string name="mcp_saving_server">正在保存并刷新工具…</string>
+  <string name="mcp_server_saved">服务器已保存，可用工具：%1$d</string>
+  <string name="mcp_edit_failed">无法保存服务器</string>
+  <string name="mcp_protocol_mode">协议模式</string>
 </resources>

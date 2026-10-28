@@ -1,6 +1,7 @@
 package io.github.mangi.eta.data.repository
 
 import android.content.Context
+import androidx.room.withTransaction
 import io.github.mangi.eta.data.db.EtaDatabase
 import io.github.mangi.eta.data.db.toDomain
 import io.github.mangi.eta.data.db.toEntity
@@ -72,6 +73,23 @@ internal object McpServerRepository {
         val names = server.enabledToolNames.toMutableSet()
         if (enabled) names += toolName else names -= toolName
         update(server.copy(enabledToolNames = names))
+    }
+
+    /** Update only the tool names reviewed by the caller, in one transaction. */
+    suspend fun setToolsEnabled(serverId: String, toolNames: Set<String>, enabled: Boolean) {
+        EtaDatabase.get(context()).withTransaction {
+            val server = requireNotNull(serverById(serverId)) { "MCP 服务器不存在" }
+            val availableNames = server.tools.mapTo(mutableSetOf()) { it.name }
+            val reviewedNames = toolNames.intersect(availableNames)
+            val names = if (enabled) {
+                server.enabledToolNames + reviewedNames
+            } else {
+                server.enabledToolNames - toolNames
+            }
+            require(dao().update(server.copy(enabledToolNames = names).toEntity()) == 1) {
+                "MCP 服务器不存在"
+            }
+        }
     }
 
     suspend fun delete(serverId: String) {

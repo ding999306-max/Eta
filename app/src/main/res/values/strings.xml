@@ -1461,4 +1461,20 @@
   <string name="chat_queue_remove">移除排队消息</string>
   <string name="chat_queue_images_only">[%1$d 张图片]</string>
   <string name="chat_queue_files_only">[%1$d 个文件]</string>
+  <string name="mcp_select_all">Select all tools</string>
+  <string name="mcp_deselect_all">Deselect all tools</string>
+  <string name="mcp_selection_count">%1$d of %2$d selected</string>
+  <string name="mcp_select_all_confirm">Enable all tools?</string>
+  <string name="mcp_select_all_summary">Some tools on %1$s may modify data or access external services. Enable all tools from this server?</string>
+  <string name="mcp_bulk_failed">Could not update tool selection</string>
+  <string name="mcp_edit_server">Edit server</string>
+  <string name="mcp_edit_server_summary">Change the server name, URL, authentication, or protocol mode.</string>
+  <string name="mcp_authentication">Authentication</string>
+  <string name="mcp_protocol_auto">Automatic</string>
+  <string name="mcp_edit_token_hint">Enter a new Bearer token. Leave it blank to keep the current token.</string>
+  <string name="mcp_token_required">A Bearer token is required for this authentication mode.</string>
+  <string name="mcp_saving_server">Saving and refreshing tools…</string>
+  <string name="mcp_server_saved">Server saved. %1$d tools available</string>
+  <string name="mcp_edit_failed">Could not save server</string>
+  <string name="mcp_protocol_mode">Protocol mode</string>
 </resources>
