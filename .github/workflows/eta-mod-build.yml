@@ -1,0 +1,80 @@
+name: Eta Mod Build (eta-mod)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+  push:
+    branches: [eta-mod]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: eta-mod-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: eta-mod
+          fetch-depth: 0
+
+      - name: Sync upstream (rebase)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/Mangi-11/Eta.git 2>/dev/null || true
+          git fetch upstream main
+          if git rebase upstream/main; then
+            echo "rebase=ok"
+          else
+            git rebase --abort
+            echo "::warning::rebase conflict, building current eta-mod as-is"
+          fi
+
+      - name: Push rebased branch
+        run: git push origin eta-mod --force-with-lease 2>/dev/null || true
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Android SDK
+        run: |
+          export ANDROID_HOME="$HOME/android-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o /tmp/ct.zip
+          unzip -q /tmp/ct.zip -d "$ANDROID_HOME/cmdline-tools"
+          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37" "build-tools;36.0.0" "platform-tools"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+
+      - name: Decode signing keystore
+        run: echo "${{ secrets.ETA_KEYSTORE_B64 }}" | base64 -d > release.keystore
+
+      - name: Build release APK
+        env:
+          ETA_RELEASE_STORE_FILE: release.keystore
+          ETA_RELEASE_STORE_PASSWORD: ${{ secrets.ETA_RELEASE_STORE_PASSWORD }}
+          ETA_RELEASE_KEY_ALIAS: ${{ secrets.ETA_RELEASE_KEY_ALIAS }}
+          ETA_RELEASE_KEY_PASSWORD: ${{ secrets.ETA_RELEASE_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --max-workers=2 \
+            -Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8' \
+            -Pkotlin.compiler.execution.strategy=in-process \
+            :app:assembleRelease -Peta.buildMetadata="${GITHUB_SHA}"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Eta-release-apk
+          path: app/build/outputs/apk/release/*.apk
