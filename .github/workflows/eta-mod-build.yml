@@ -59,7 +59,7 @@ jobs:
           echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
 
       - name: Decode signing keystore
-        run: echo "${{ secrets.ETA_KEYSTORE_B64 }}" | base64 -d > release.keystore
+        run: echo "${{ secrets.ETA_KEYSTORE_B64 }}" | base64 -d > app/release.keystore
 
       - name: Build release APK
         env:
